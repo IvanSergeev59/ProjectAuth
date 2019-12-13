@@ -17,7 +17,7 @@ module.exports.deleteCards = (req, res) => {
     .then((card) => {
       if (req.user._id === card.owner.toString()) {
         Card.findByIdAndRemove(req.params.cardId)
-          .then((cardRemove) => res.delete({ data: cardRemove }))
+          .then((cardRemove) => res.send({ data: cardRemove }))
           .catch((err) => res.status(500).send({ message: err }));
       } else {
         res.status(403).send({ message: 'Het nPaB' });

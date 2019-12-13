@@ -34,8 +34,7 @@ module.exports.signUp = (req, res) => {
     }))
     .then((user) => {
       res.status(201).send({
-        // eslint-disable-next-line no-undef
-        _id: user_id,
+        _id: user._id,
         email: user.email,
       });
     })
