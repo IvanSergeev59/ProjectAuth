@@ -46,7 +46,7 @@ module.exports.signUp = (req, res) => {
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password).select('+password')
+  return User.findUserByCredentials.select('+password')(email, password)
     .then((user) => {
       res.send({
         token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
