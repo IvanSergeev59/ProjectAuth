@@ -1,9 +1,5 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
-
-
-process.env.Key = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : require('../config');
 
 
 const User = require('../models/user');
@@ -69,7 +65,7 @@ module.exports.login = (req, res, next) => {
         throw new Unauthorized('Произошла ошибка');
       }
       res.send({
-        token: jwt.sign({ _id: user._id }, process.env.KEY, { expiresIn: '7d' }),
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
       })
         .catch(next);
     });
