@@ -20,7 +20,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.get('/', auth, (req, res) => {
   res.send({ message: 'API' });
 });
-
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 app.post('/signup', celebrate({
   // валидируем параметры
   body: Joi.object().keys({
