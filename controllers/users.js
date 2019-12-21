@@ -1,29 +1,45 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+require('dotenv').config();
 
-module.exports.getUsers = (req, res) => {
+
+process.env.Key = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : require('../config');
+
+
+const User = require('../models/user');
+const Unauthorized = require('../errors/Unauthorized.js');
+const NotFoundError = require('../errors/not-found-err.js');
+const BadRequest = require('../errors/bad-request.js');
+const InternalServerError = require('../errors/internal-server-error.js');
+
+module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then((user) => {
+      if (!user) {
+        throw new InternalServerError('Произошла ошибка');
+      }
+      res.send({ data: user });
+    })
+    .catch(next);
 };
-module.exports.getUsersId = (req, res) => {
+module.exports.getUsersId = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователя с не существует!' });
+        throw new InternalServerError('Пользователя с не существует!');
       } else {
         res.send({ data: user });
       }
     })
     .catch((err) => {
       if (err.message.indexOf('Cast to ObjectId failed') === 0) {
-        res.status(404).send({ message: 'Неправильный id' });
+        throw new NotFoundError('Неправильный id');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.signUp = (req, res) => {
+module.exports.signUp = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       email: req.body.email,
@@ -33,26 +49,28 @@ module.exports.signUp = (req, res) => {
       password: hash,
     }))
     .then((user) => {
+      if (!user) {
+        throw new BadRequest('Произошла ошибка');
+      }
       res.status(201).send({
         _id: user._id,
         email: user.email,
-      });
-    })
-    .catch((err) => {
-      res.status(400).send(err);
+      })
+        .catch(next);
     });
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
+      if (!user) {
+        throw new Unauthorized('Произошла ошибка');
+      }
       res.send({
-        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
-      });
-    })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
+        token: jwt.sign({ _id: user._id }, process.env.KEY, { expiresIn: '7d' }),
+      })
+        .catch(next);
     });
 };
