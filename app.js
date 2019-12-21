@@ -7,7 +7,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { signUp, login } = require('./controllers/users');
 const auth = require('./middlewares/auth.js');
 
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 const app = express();
 app.use(requestLogger); // подключаем логгер запросов
 app.use(bodyParser.json());
