@@ -21,9 +21,9 @@ module.exports.createCards = (req, res, next) => {
       if (!card) {
         throw new InternalServerError('Произошла ошибка');
       }
-      res.status(201).send({ date: card })
-        .catch(next);
-    });
+      res.status(201).send({ date: card });
+    })
+    .catch(next);
 };
 
 
