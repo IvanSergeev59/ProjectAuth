@@ -35,25 +35,33 @@ module.exports.getUsersId = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.signUp = (req, res, next) => {
-  bcrypt.hash(req.body.password, 10)
-    .then((hash) => User.create({
-      email: req.body.email,
-      name: req.body.name,
-      about: req.body.about,
-      avatar: req.body.avatar,
-      password: hash,
-    }))
-    .then((user) => {
-      if (!user) {
-        throw new BadRequest('Произошла ошибка');
-      }
-      res.status(201).send({
-        _id: user._id,
-        email: user.email,
+module.exports.signUp = async (req, res, next) => {
+  const {
+    name, about, avatar, password, email,
+  } = req.body;
+  const isExist = await User.findOne({ email });
+  if (isExist) {
+    return next(new BadRequest('Такой пользователь уже существует'));
+  }
+  if (password) {
+    bcrypt.hash(req.body.password, 10)
+      .then((hash) => User.create({
+        email: req.body.email,
+        name: req.body.name,
+        about: req.body.about,
+        avatar: req.body.avatar,
+        password: hash,
+      }))
+      .then((user) => {
+        res.status(201).send({
+          _id: user._id,
+          email: user.email,
+        });
       })
-        .catch(next);
-    });
+      .catch((err) => next(new BadRequest('произошла ошиба')))
+      .catch(next)
+  }
+
 };
 
 module.exports.login = (req, res, next) => {
@@ -68,5 +76,5 @@ module.exports.login = (req, res, next) => {
     .catch((err) => {
       throw new Unauthorized('Неправильные почта или пароль');
     })
-    .catch(next)
+    .catch(next);
 };
