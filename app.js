@@ -7,7 +7,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { signUp, login } = require('./controllers/users');
 const auth = require('./middlewares/auth.js');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 const app = express();
 app.use(requestLogger); // подключаем логгер запросов
 app.use(bodyParser.json());
@@ -53,7 +53,7 @@ app.use('/cards', auth, require('./routes/cards'));
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
+  res.status(err.statusCode || 500).send({ message: err.message });
 });
 app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors()); // обработчик ошибок celebrate
