@@ -38,6 +38,7 @@ module.exports.deleteCards = (req, res, next) => {
       } else {
         return next(new Unauthorized('Нет прав'));
       }
+      return Card;
     })
     .catch((err) => {
       if (err.message.indexOf('Cast to ObjectId failed') === 0) {

@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+const key = NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret';
 
 const User = require('../models/user');
 const Unauthorized = require('../errors/Unauthorized.js');
@@ -37,7 +40,7 @@ module.exports.getUsersId = (req, res, next) => {
 
 module.exports.signUp = async (req, res, next) => {
   const {
-    name, about, avatar, password, email,
+    password, email,
   } = req.body;
   const isExist = await User.findOne({ email });
   if (isExist) {
@@ -58,10 +61,10 @@ module.exports.signUp = async (req, res, next) => {
           email: user.email,
         });
       })
-      .catch((err) => next(new BadRequest('произошла ошиба')))
-      .catch(next)
+      .catch(() => next(new BadRequest('произошла ошиба')))
+      .catch(next);
   }
-
+  return User;
 };
 
 module.exports.login = (req, res, next) => {
@@ -70,10 +73,10 @@ module.exports.login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       res.send({
-        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
+        token: jwt.sign({ _id: user._id }, key, { expiresIn: '7d' }),
       });
     })
-    .catch((err) => {
+    .catch(() => {
       throw new Unauthorized('Неправильные почта или пароль');
     })
     .catch(next);
