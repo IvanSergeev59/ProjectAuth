@@ -1,8 +1,9 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const localKey = require('../config');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const key = NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret';
+const key = NODE_ENV === 'production' ? JWT_SECRET : localKey;
 
 
 const Unauthorized = require('../errors/Unauthorized.js');

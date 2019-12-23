@@ -1,9 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const localKey = require('../config');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const key = NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret';
+const key = NODE_ENV === 'production' ? JWT_SECRET : localKey;
 
 const User = require('../models/user');
 const Unauthorized = require('../errors/Unauthorized.js');
