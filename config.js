@@ -1,1 +1,1 @@
-module.exports = 'dev-secret';
+module.exports = 'super-secret';

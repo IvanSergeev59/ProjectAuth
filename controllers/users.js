@@ -4,7 +4,7 @@ require('dotenv').config();
 
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const key = NODE_ENV === 'development' ? 'dev-secret' : JWT_SECRET;
+const key = NODE_ENV === 'development' ? 'super-secret' : JWT_SECRET;
 
 const User = require('../models/user');
 const Unauthorized = require('../errors/Unauthorized.js');
@@ -78,7 +78,7 @@ module.exports.login = (req, res, next) => {
       });
     })
     .catch(() => {
-      throw new Unauthorized('Неправильные почта или пароль');
+      throw new Unauthorized('Неправильные почта или пароль mod');
     })
     .catch(next);
 };
